@@ -7,9 +7,13 @@
     </appender>
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
         <File>log/events.log</File>
+        <encoder>
+            <pattern>%d %p %t %c -%m%n</pattern>
+        </encoder>
     </appender>
     <logger name="com.github.sakuramatrix.andrewgregersen.p1.domain.Main"/>
     <logger name="cass"/>
+    <logger name="cass.account"/>
     <logger name="server"/>
     <logger name="finance"/>
 

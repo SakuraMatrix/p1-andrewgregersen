@@ -1,26 +1,26 @@
 package com.github.sakuramatrix.andrewgregersen.p1.interfaces;
 
-import com.github.sakuramatrix.andrewgregersen.p1.backend.DatabaseConnector;
+import com.github.sakuramatrix.andrewgregersen.p1.backend.databaseDriver.DatabaseDriver;
 
 public interface DatabaseInterface {
 
-  static DatabaseConnector connect(String address) {
+  static DatabaseDriver connect(String address) {
     return null;
   }
 
-  static DatabaseConnector connect() {
+  static DatabaseDriver connect() {
     return null;
   }
 
-  static DatabaseConnector connect(int port) {
+  static DatabaseDriver connect(int port) {
     return null;
   }
 
-  void insert();
+  void insert(String query);
 
-  void delete();
+  void delete(String query);
 
-  void update();
+  void update(String query);
 
-  void read();
+  void read(String query);
 }

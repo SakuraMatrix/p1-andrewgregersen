@@ -7,10 +7,16 @@ An application that helps the user track and manage their personal finances thro
 The features implemented in this project should allow the user to do the following:
 
 1. Access the program through the web browser
-2. Have the ability to have multiple profiles
-3. Add and remove available funds that the application offers
-4. Budget their monthly spending and be able to break it down week by week.
-5. Update their information as needed (budget allowance)
+    1. Implemented through a Restful API
+2. Have the ability to have multiple accounts
+    1. And have access to them
+    2. Create new accounts
+    3. Delete old accounts
+    4. Read information about accounts
+3. Add funds to and account
+4. Remove available funds from an account
+6. Budget their monthly spending and be able to break it down week by week.
+7. Update their information as needed (budget allowance)
 
 ## Technologies
 

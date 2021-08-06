@@ -1,8 +1,9 @@
 package com.github.sakuramatrix.andrewgregersen.p1.domain;
 
 import ch.qos.logback.classic.Logger;
-import com.github.sakuramatrix.andrewgregersen.p1.backend.DatabaseConnector;
+import com.datastax.oss.driver.api.core.CqlSession;
 import com.github.sakuramatrix.andrewgregersen.p1.backend.Server;
+import com.github.sakuramatrix.andrewgregersen.p1.backend.databaseDriver.DatabaseDriver;
 import org.slf4j.LoggerFactory;
 
 public class Main {
@@ -12,7 +13,7 @@ public class Main {
   public static void main(String[] args) {
     log.info("Starting application");
     log.info("Connecting to Database...");
-    DatabaseConnector db = DatabaseConnector.connect();
+    CqlSession db = DatabaseDriver.connect();
     log.info("Starting Server...");
     Server server = Server.start(8080);
   }
