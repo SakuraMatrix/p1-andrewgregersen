@@ -1,4 +1,4 @@
-import com.github.sakuramatrix.andrewgregersen.p1.backend.Server;
+import com.github.sakuramatrix.andrewgregersen.p1.application.Server;
 import org.junit.Assert;
 import org.junit.Test;
 

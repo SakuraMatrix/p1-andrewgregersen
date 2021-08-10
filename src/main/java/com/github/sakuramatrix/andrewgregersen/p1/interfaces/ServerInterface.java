@@ -1,6 +1,6 @@
 package com.github.sakuramatrix.andrewgregersen.p1.interfaces;
 
-import com.github.sakuramatrix.andrewgregersen.p1.backend.Server;
+import com.github.sakuramatrix.andrewgregersen.p1.application.Server;
 
 public interface ServerInterface {
   static Server start() {

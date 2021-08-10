@@ -1,4 +1,4 @@
-package com.github.sakuramatrix.andrewgregersen.p1.backend.databaseDriver;
+package com.github.sakuramatrix.andrewgregersen.p1.application.databaseDriver;
 
 import ch.qos.logback.classic.Logger;
 import com.datastax.oss.driver.api.core.CqlSession;
@@ -9,6 +9,10 @@ public class DatabaseDriver {
   private static final Logger log = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger("cass");
 
   private final CqlSession session;
+
+  public static DatabaseDriver create() {
+    return new DatabaseDriver();
+  }
 
   public static CqlSession connect() {
     return new DatabaseDriver().getSession();

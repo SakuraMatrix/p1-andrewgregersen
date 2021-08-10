@@ -1,7 +1,7 @@
 import com.datastax.oss.driver.api.core.CqlSession;
-import com.github.sakuramatrix.andrewgregersen.p1.backend.account.Account;
-import com.github.sakuramatrix.andrewgregersen.p1.backend.account.AccountRepository;
-import com.github.sakuramatrix.andrewgregersen.p1.backend.databaseDriver.DatabaseDriver;
+import com.github.sakuramatrix.andrewgregersen.p1.application.account.Account;
+import com.github.sakuramatrix.andrewgregersen.p1.application.account.AccountRepository;
+import com.github.sakuramatrix.andrewgregersen.p1.application.databaseDriver.DatabaseDriver;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -28,9 +28,9 @@ public class CassandraTest {
   @Test
   public void insertTest1() {
     UUID id = UUID.randomUUID();
-    Account expected = Account.from(id, "test0", "test0");
-    repo.create(Account.from(id, "test0", "test0"));
-    Account actual = Account.parseResult(repo.read(id));
+    Account expected = Account.from(id, "test0", "test0", repo);
+    repo.create(Account.from(id, "test0", "test0", repo));
+    Account actual = repo.read(id);
     Assert.assertEquals(expected, actual);
   }
 }

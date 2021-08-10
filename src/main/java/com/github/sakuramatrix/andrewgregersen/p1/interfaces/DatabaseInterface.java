@@ -1,6 +1,6 @@
 package com.github.sakuramatrix.andrewgregersen.p1.interfaces;
 
-import com.github.sakuramatrix.andrewgregersen.p1.backend.databaseDriver.DatabaseDriver;
+import com.github.sakuramatrix.andrewgregersen.p1.application.databaseDriver.DatabaseDriver;
 
 public interface DatabaseInterface {
 

@@ -13,10 +13,12 @@ The features implemented in this project should allow the user to do the followi
     2. Create new accounts
     3. Delete old accounts
     4. Read information about accounts
-3. Add funds to and account
-4. Remove available funds from an account
-6. Budget their monthly spending and be able to break it down week by week.
-7. Update their information as needed (budget allowance)
+3. Update the budget of an Account
+    1. Increase
+    2. Decease
+4. Budget their monthly spending
+    1. Is able to break it down week by week.
+5. Update their information as needed (budget allowance)
 
 ## Technologies
 
