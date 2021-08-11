@@ -2,7 +2,6 @@ package com.github.sakuramatrix.andrewgregersen.p1.domain;
 
 import ch.qos.logback.classic.Logger;
 import com.github.sakuramatrix.andrewgregersen.p1.application.account.AccountRepository;
-import com.github.sakuramatrix.andrewgregersen.p1.application.budget.BudgetRepository;
 import com.github.sakuramatrix.andrewgregersen.p1.application.databaseDriver.DatabaseDriver;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
@@ -15,7 +14,6 @@ public class Main {
   private static final Logger log = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger("main");
   private static DatabaseDriver db;
   private static AccountRepository aRepo;
-  private static BudgetRepository bRepo;
 
   public static void main(String[] args) {
     log.info("Starting application");
@@ -29,9 +27,6 @@ public class Main {
     log.info("Creating Account Repository");
     aRepo = new AccountRepository("personalFinance", db.getSession());
     log.info("Created Account Repository");
-    log.info("Creating Budget Repository");
-    bRepo = new BudgetRepository();
-    log.info("Created Budget Repository");
     log.info("Starting Server...");
     startServer();
     log.info("Waiting for responses...");
@@ -60,14 +55,9 @@ public class Main {
                                         .read(UUID.fromString(request.param("accountId")))
                                         .toString())))
                     .get(
-                        "/budget/{accountId}",
+                        "/error",
                         (request, response) ->
-                            response.sendString(Mono.just(bRepo.read(request.param("accountId")))))
-                    .get(
-                        "/budgets",
-                        (request, response) -> response.sendString(Mono.just(bRepo.readAll())))
-                    .get("budget/{query}", (request, response) -> {})
-                    .get("/error", (request, response) -> response.sendNotFound()))
+                            response.status(404).addHeader("Message", "What have you done?!?!?!?")))
         .bindNow()
         .onDispose()
         .block();

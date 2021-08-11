@@ -31,11 +31,6 @@ public class AccountRepository {
     this.session = session;
   }
 
-  private ResultSet executeStatement(SimpleStatement statement) {
-    statement.setKeyspace(keyspace);
-    return this.session.execute(statement);
-  }
-
   public void create(Account account) {
     UUID accountID = UUID.randomUUID();
     account.setUuid(accountID);

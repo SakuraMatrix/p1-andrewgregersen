@@ -8,10 +8,6 @@ Create TABLE IF NOT EXISTS accounts (
     last_name text,
     income double,
     budget double,
+    allowance double,
     PRIMARY KEY (account_id, last_name)
-);
-
-CREATE TABLE budget(
-    account_id uuid,
-    weekly bool
 );
