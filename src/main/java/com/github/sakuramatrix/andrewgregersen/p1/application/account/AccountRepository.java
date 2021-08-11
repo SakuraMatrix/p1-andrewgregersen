@@ -53,7 +53,7 @@ public class AccountRepository {
             .setString(1, account.getFName())
             .setString(2, account.getLName());
 
-    session.execute(boundStatement);
+    session.executeReactive(boundStatement);
   }
 
   public Account read(UUID uuid) {
@@ -64,7 +64,7 @@ public class AccountRepository {
             .where(Relation.column("account_id").isEqualTo(bindMarker()))
             .build();
     BoundStatement preparedStatement = session.prepare(readStatement).bind().setUuid(0, uuid);
-    return parseResult(session.execute(preparedStatement));
+    return parseResult((ResultSet) session.executeReactive(preparedStatement));
   }
 
   public String readAll() {
@@ -81,7 +81,8 @@ public class AccountRepository {
             .setColumn("budget", bindMarker())
             .where(Relation.column("account_id").isEqualTo(bindMarker()))
             .build();
-    session.execute(session.prepare(updateStatement).bind().setUuid(0, uuid).setDouble(3, funds));
+    session.executeReactive(
+        session.prepare(updateStatement).bind().setUuid(0, uuid).setDouble(3, funds));
   }
 
   public Account parseResult(ResultSet result) {
