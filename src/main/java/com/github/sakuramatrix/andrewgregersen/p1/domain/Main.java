@@ -1,8 +1,13 @@
 package com.github.sakuramatrix.andrewgregersen.p1.domain;
 
 import ch.qos.logback.classic.Logger;
-import com.github.sakuramatrix.andrewgregersen.p1.application.account.AccountRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.sakuramatrix.andrewgregersen.p1.application.account.Account;
+import com.github.sakuramatrix.andrewgregersen.p1.application.account.AccountServer;
 import com.github.sakuramatrix.andrewgregersen.p1.application.databaseDriver.DatabaseDriver;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.server.HttpServer;
@@ -13,7 +18,7 @@ public class Main {
 
   private static final Logger log = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger("main");
   private static DatabaseDriver db;
-  private static AccountRepository aRepo;
+  private static AccountServer aServer;
 
   public static void main(String[] args) {
     log.info("Starting application");
@@ -24,8 +29,8 @@ public class Main {
     if (db.getSession().isClosed()) {
       log.error("Connection to database is not open! Please check to make sure the DB is running!");
     }
-    log.info("Creating Account Repository");
-    aRepo = new AccountRepository("personalFinance", db.getSession());
+    log.info("Creating Account Server");
+    aServer = AccountServer.create(db.getSession(), "personalFinance");
     log.info("Created Account Repository");
     log.info("Starting Server...");
     startServer();
@@ -45,15 +50,15 @@ public class Main {
                             response.sendString(Mono.just("Hello " + request.param("param") + "!")))
                     .get(
                         "/accounts",
-                        (request, response) -> response.sendString(Mono.just(aRepo.readAll())))
+                        (request, response) ->
+                            response.send(aServer.getAll().map(Main::toByteBuff)))
                     .get(
                         "/account/{accountId}",
                         (request, response) ->
-                            response.sendString(
-                                Mono.just(
-                                    aRepo
-                                        .read(UUID.fromString(request.param("accountId")))
-                                        .toString())))
+                            response.send(
+                                aServer
+                                    .getAccount(UUID.fromString(request.param("accountId")))
+                                    .map(Main::toByteBuff)))
                     .get(
                         "/error",
                         (request, response) ->
@@ -62,5 +67,17 @@ public class Main {
         .onDispose()
         .block();
     log.info("Server is now listening for connections!");
+  }
+
+  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
+  private static ByteBuf toByteBuff(Object o) {
+    try {
+      return Unpooled.buffer()
+          .writeBytes(OBJECT_MAPPER.writerFor(Account.class).writeValueAsBytes(o));
+    } catch (JsonProcessingException e) {
+      e.printStackTrace();
+    }
+    return null;
   }
 }

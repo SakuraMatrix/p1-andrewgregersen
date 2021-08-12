@@ -10,17 +10,18 @@ public class Account {
   private double budget;
   private double income;
 
-  private final AccountRepository repo;
-
-  public static Account from(UUID uuid, String fName, String lName, AccountRepository repo) {
-    return new Account(uuid, fName, lName, repo);
+  public static Account from(UUID uuid, String fName, String lName) {
+    return new Account(uuid, fName, lName);
   }
 
-  private Account(UUID uuid, String fName, String lName, AccountRepository repo) {
+  public static Account from(String fName, String lName) {
+    return new Account(UUID.randomUUID(), fName, lName);
+  }
+
+  private Account(UUID uuid, String fName, String lName) {
     this.fName = fName;
     this.lName = lName;
     this.uuid = uuid;
-    this.repo = repo;
   }
 
   public String getFName() {
@@ -45,22 +46,6 @@ public class Account {
 
   public void setUuid(UUID uuid) {
     this.uuid = uuid;
-  }
-
-  public double getFunds() {
-    return this.budget;
-  }
-
-  public double addFunds(double moreFunds) {
-    this.budget -= moreFunds;
-    repo.updateFunds(budget, uuid);
-    return budget;
-  }
-
-  public double removeFunds(double lessFunds) {
-    this.budget -= lessFunds;
-    repo.updateFunds(budget, uuid);
-    return budget;
   }
 
   @Override

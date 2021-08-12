@@ -7,8 +7,9 @@ import com.datastax.oss.driver.api.core.cql.Row;
 import com.datastax.oss.driver.api.core.cql.SimpleStatement;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.datastax.oss.driver.api.querybuilder.relation.Relation;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
 import java.util.UUID;
 
 import static com.datastax.oss.driver.api.querybuilder.QueryBuilder.bindMarker;
@@ -56,23 +57,25 @@ public class AccountRepository {
     session.executeReactive(boundStatement);
   }
 
-  public Account read(UUID uuid) {
-
-    SimpleStatement readStatement =
-        QueryBuilder.selectFrom(keyspace, TABLE_NAME)
-            .all()
-            .where(Relation.column("account_id").isEqualTo(bindMarker()))
-            .build();
-    BoundStatement preparedStatement = session.prepare(readStatement).bind().setUuid(0, uuid);
-    return parseResult((ResultSet) session.executeReactive(preparedStatement));
+  public Mono<Account> read(UUID uuid) {
+    return Mono.from(
+            session.executeReactive("SELECT * FROM personalFinance.accounts WHERE item_id=?"))
+        .map(
+            row ->
+                Account.from(
+                    row.getUuid("account_id"),
+                    row.getString("first_name"),
+                    row.getString("last_name")));
   }
 
-  public String readAll() {
-    SimpleStatement readStatement = QueryBuilder.selectFrom(keyspace, TABLE_NAME).all().build();
-    ArrayList<Account> a = parseManyResult(session.execute(session.prepare(readStatement).bind()));
-    StringBuilder builder = new StringBuilder();
-    a.forEach(it -> builder.append(it.toString()).append("\n"));
-    return builder.toString();
+  public Flux<Account> readAll() {
+    return Flux.from(session.executeReactive("SELECT * FROM personalFinance.accounts"))
+        .map(
+            row ->
+                Account.from(
+                    row.getUuid("account_id"),
+                    row.getString("first_name"),
+                    row.getString("last_name")));
   }
 
   public void updateFunds(double funds, UUID uuid) {
@@ -92,22 +95,8 @@ public class AccountRepository {
           Account.from(
               row.get("account_id", UUID.class),
               row.get("first_name", String.class),
-              row.get("last_name", String.class),
-              this);
+              row.get("last_name", String.class));
     }
     return account;
-  }
-
-  public ArrayList<Account> parseManyResult(ResultSet result) {
-    ArrayList<Account> accounts = new ArrayList<>();
-    for (Row row : result) {
-      accounts.add(
-          Account.from(
-              row.get("account_id", UUID.class),
-              row.get("first_name", String.class),
-              row.get("last_name", String.class),
-              this));
-    }
-    return accounts;
   }
 }
