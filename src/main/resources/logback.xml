@@ -14,6 +14,8 @@
     <logger name="main"/>
     <logger name="cass"/>
     <logger name="cass.account"/>
+    <logger name="cass.account.repo"/>
+    <logger name="cass.account.server"/>
     <logger name="cass.budget"/>
     <logger name="server"/>
     <logger name="finance"/>

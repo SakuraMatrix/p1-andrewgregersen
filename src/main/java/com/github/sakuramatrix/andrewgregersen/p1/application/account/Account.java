@@ -1,27 +1,50 @@
 package com.github.sakuramatrix.andrewgregersen.p1.application.account;
 
 import java.util.Objects;
-import java.util.UUID;
 
 public class Account {
   private String fName;
   private String lName;
-  private UUID uuid;
+  private int uuid;
   private double budget;
   private double income;
 
-  public static Account from(UUID uuid, String fName, String lName) {
+  public static Account from(int uuid, String fName, String lName) {
     return new Account(uuid, fName, lName);
   }
 
   public static Account from(String fName, String lName) {
-    return new Account(UUID.randomUUID(), fName, lName);
+    return new Account(AccountRepository.getNewID(), fName, lName);
   }
 
-  private Account(UUID uuid, String fName, String lName) {
+  private Account(int uuid, String fName, String lName) {
     this.fName = fName;
     this.lName = lName;
     this.uuid = uuid;
+  }
+
+  private Account(int uuid, String fName, String lName, double budget, double income) {
+    this.fName = fName;
+    this.lName = lName;
+    this.uuid = uuid;
+    this.budget = budget;
+    this.income = income;
+  }
+
+  public void setBudget(double budget) {
+    this.budget = budget;
+  }
+
+  public void setIncome(double income) {
+    this.income = income;
+  }
+
+  public double getBudget() {
+    return budget;
+  }
+
+  public double getIncome() {
+    return income;
   }
 
   public String getFName() {
@@ -40,11 +63,11 @@ public class Account {
     this.lName = lName;
   }
 
-  public UUID getUuid() {
+  public int getUuid() {
     return uuid;
   }
 
-  public void setUuid(UUID uuid) {
+  public void setUuid(int uuid) {
     this.uuid = uuid;
   }
 

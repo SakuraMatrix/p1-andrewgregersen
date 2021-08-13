@@ -1,86 +1,81 @@
 package com.github.sakuramatrix.andrewgregersen.p1.application.account;
 
+import ch.qos.logback.classic.Logger;
 import com.datastax.oss.driver.api.core.CqlSession;
-import com.datastax.oss.driver.api.core.cql.BoundStatement;
-import com.datastax.oss.driver.api.core.cql.ResultSet;
-import com.datastax.oss.driver.api.core.cql.Row;
 import com.datastax.oss.driver.api.core.cql.SimpleStatement;
-import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.datastax.oss.driver.api.querybuilder.relation.Relation;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Random;
 import java.util.UUID;
 
 import static com.datastax.oss.driver.api.querybuilder.QueryBuilder.bindMarker;
 import static com.datastax.oss.driver.api.querybuilder.QueryBuilder.update;
 
+@Repository
 public class AccountRepository {
 
+  private static final Logger log =
+      (ch.qos.logback.classic.Logger) LoggerFactory.getLogger("cass.account.repo");
   private static final String TABLE_NAME = "accounts";
-  private final String keyspace;
+  private final String KEYSPACE = "personalFinance";
   private final CqlSession session;
 
   /**
    * Constructor for the Account DAO
    *
-   * @param keyspace: The name of the keyspace to connect to
    * @param session: The database connection.
    */
-  public AccountRepository(String keyspace, CqlSession session) {
-    this.keyspace = keyspace;
+  public AccountRepository(CqlSession session) {
     this.session = session;
   }
 
-  public void create(Account account) {
-    UUID accountID = UUID.randomUUID();
-    account.setUuid(accountID);
-
-    SimpleStatement insertStatement =
-        QueryBuilder.insertInto(TABLE_NAME)
-            .value("account_id", bindMarker())
-            .value("first_name", bindMarker())
-            .value("last_name", bindMarker())
-            .value("budget", bindMarker())
-            .build();
-
-    insertStatement.setKeyspace(keyspace);
-
-    BoundStatement boundStatement =
-        session
-            .prepare(insertStatement)
-            .bind()
-            .setUuid(0, account.getUuid())
-            .setString(1, account.getFName())
-            .setString(2, account.getLName());
-
-    session.executeReactive(boundStatement);
+  public Account create(Account account) {
+    session.executeReactive(
+        SimpleStatement.builder(
+                "INSERT INTO personalFinance.accounts (account_id,first_name,last_name,budget,income) values (?,?,?,?,?)")
+            .addPositionalValues(
+                account.getUuid(),
+                account.getFName(),
+                account.getLName(),
+                account.getBudget(),
+                account.getIncome())
+            .build());
+    return account;
   }
 
-  public Mono<Account> read(UUID uuid) {
+  public Mono<Account> read(int uuid) {
+    log.info("Attempting to read from DB");
     return Mono.from(
-            session.executeReactive("SELECT * FROM personalFinance.accounts WHERE item_id=?"))
+            session.executeReactive(
+                SimpleStatement.builder("SELECT * FROM personalFinance.accounts WHERE account_id=?")
+                    .addPositionalValue(uuid)
+                    .build()))
         .map(
             row ->
                 Account.from(
-                    row.getUuid("account_id"),
+                    row.getInt("account_id"),
                     row.getString("first_name"),
                     row.getString("last_name")));
   }
 
   public Flux<Account> readAll() {
+    log.info("Attempting to read from DB");
     return Flux.from(session.executeReactive("SELECT * FROM personalFinance.accounts"))
         .map(
             row ->
                 Account.from(
-                    row.getUuid("account_id"),
+                    row.getInt("account_id"),
                     row.getString("first_name"),
                     row.getString("last_name")));
   }
 
   public void updateFunds(double funds, UUID uuid) {
     SimpleStatement updateStatement =
-        update(keyspace, "account")
+        update("account")
             .setColumn("budget", bindMarker())
             .where(Relation.column("account_id").isEqualTo(bindMarker()))
             .build();
@@ -88,15 +83,9 @@ public class AccountRepository {
         session.prepare(updateStatement).bind().setUuid(0, uuid).setDouble(3, funds));
   }
 
-  public Account parseResult(ResultSet result) {
-    Account account = null;
-    for (Row row : result) {
-      account =
-          Account.from(
-              row.get("account_id", UUID.class),
-              row.get("first_name", String.class),
-              row.get("last_name", String.class));
-    }
-    return account;
+  private static final Random ID_GENERATOR = new Random();
+
+  protected static int getNewID() {
+    return ID_GENERATOR.nextInt();
   }
 }
