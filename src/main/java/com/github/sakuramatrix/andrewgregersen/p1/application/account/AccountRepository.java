@@ -3,17 +3,12 @@ package com.github.sakuramatrix.andrewgregersen.p1.application.account;
 import ch.qos.logback.classic.Logger;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.SimpleStatement;
-import com.datastax.oss.driver.api.querybuilder.relation.Relation;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Random;
-import java.util.UUID;
-
-import static com.datastax.oss.driver.api.querybuilder.QueryBuilder.bindMarker;
-import static com.datastax.oss.driver.api.querybuilder.QueryBuilder.update;
 
 @Repository
 public class AccountRepository {
@@ -34,7 +29,7 @@ public class AccountRepository {
   }
 
   public Account create(Account account) {
-    session.executeReactive(
+    SimpleStatement stmt =
         SimpleStatement.builder(
                 "INSERT INTO personalFinance.accounts (account_id,first_name,last_name,budget,income) values (?,?,?,?,?)")
             .addPositionalValues(
@@ -43,7 +38,8 @@ public class AccountRepository {
                 account.getLName(),
                 account.getBudget(),
                 account.getIncome())
-            .build());
+            .build();
+    Flux.from(session.executeReactive(stmt)).subscribe();
     return account;
   }
 
@@ -73,14 +69,58 @@ public class AccountRepository {
                     row.getString("last_name")));
   }
 
-  public void updateFunds(double funds, UUID uuid) {
-    SimpleStatement updateStatement =
-        update("account")
-            .setColumn("budget", bindMarker())
-            .where(Relation.column("account_id").isEqualTo(bindMarker()))
+  public Mono<Double> readIncome(int uuid) {
+    return Mono.from(
+            session.executeReactive(
+                SimpleStatement.builder(
+                        "SELECT income from personalFinance.accounts WHERE account_id = ?")
+                    .addPositionalValue(uuid)
+                    .build()))
+        .map(row -> row.getDouble("income"));
+  }
+
+  public Flux<Double> readAllIncome() {
+    return Flux.from(
+            session.executeReactive(
+                SimpleStatement.builder("SELECT income from personalFinance.accounts").build()))
+        .map(row -> row.getDouble("income"));
+  }
+
+  public Double updateIncome(double income, int uuid) {
+    SimpleStatement stmt =
+        SimpleStatement.builder(
+                "UPDATE personalFinance.accounts SET income = ? WHERE account_id = ? IF EXISTS")
+            .addPositionalValues(income, uuid)
             .build();
-    session.executeReactive(
-        session.prepare(updateStatement).bind().setUuid(0, uuid).setDouble(3, funds));
+    session.executeReactive(stmt);
+    return income;
+  }
+
+  public Mono<Double> readBudget(int uuid) {
+    return Mono.from(
+            session.executeReactive(
+                SimpleStatement.builder(
+                        "SELECT budget from personalFinance.accounts WHERE account_id = ?")
+                    .addPositionalValue(uuid)
+                    .build()))
+        .map(row -> row.getDouble("budget"));
+  }
+
+  public Flux<Double> readAllBudget() {
+    return Flux.from(
+            session.executeReactive(
+                SimpleStatement.builder("SELECT budget from personalFinance.accounts").build()))
+        .map(row -> row.getDouble("budget"));
+  }
+
+  public Double updateBudget(double budget, int uuid) {
+    SimpleStatement stmt =
+        SimpleStatement.builder(
+                "UPDATE personalFinance.accounts SET budget = ? WHERE account_id = ? IF EXISTS")
+            .addPositionalValues(budget, uuid)
+            .build();
+    session.executeReactive(stmt);
+    return budget;
   }
 
   private static final Random ID_GENERATOR = new Random();

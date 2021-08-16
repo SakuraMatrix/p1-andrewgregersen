@@ -33,4 +33,32 @@ public class AccountService {
   public Account newAccount(Account account) {
     return repo.create(account);
   }
+
+  public Mono<Double> getBudget(String uuid) {
+    log.info("Getting Budget Info from account: " + uuid);
+    return repo.readBudget(Integer.parseInt(uuid));
+  }
+
+  public Flux<Double> getAllBudgets() {
+    log.info("Getting Budget Info from all accounts");
+    return repo.readAllBudget();
+  }
+
+  public Mono<Double> getIncome(String uuid) {
+    log.info("Getting Budget Info from account: " + uuid);
+    return repo.readIncome(Integer.parseInt(uuid));
+  }
+
+  public Flux<Double> getAllIncomes() {
+    log.info("Getting Budget Info from all accounts");
+    return repo.readAllIncome();
+  }
+
+  public Double updateBudget(String uuid, String newAmount) {
+    return repo.updateBudget(Double.parseDouble(newAmount), Integer.parseInt(uuid));
+  }
+
+  public Double updateIncome(String uuid, String newAmount) {
+    return repo.updateIncome(Double.parseDouble(newAmount), Integer.parseInt(uuid));
+  }
 }
