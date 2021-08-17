@@ -38,6 +38,22 @@ public class Main {
     return null;
   }
 
+  public static ByteBuf doubleToByteBuff(Object o) {
+    try {
+      return Unpooled.buffer()
+          .writeBytes(OBJECT_MAPPER.writerFor(Double.class).writeValueAsBytes(o));
+    } catch (JsonProcessingException e) {
+      e.printStackTrace();
+    }
+    return null;
+  }
+
+  /**
+   * Deserializes an Account upon a user generated JSON users POST request from the server
+   *
+   * @param str
+   * @return
+   */
   public static Account parseAccount(String str) {
     Account account = null;
     try {

@@ -31,6 +31,19 @@ The following technologies were used:
 5. Cassandra DB
 6. Maven
 
+## RESTful Endpoints
+
+- GET /account/{accountId}: Retrieves the account information from the given ID
+    - Example:{"id":1,"budget":500.0,"income":1000.0,"fname":"Andrew","lname":"Gregersen"}
+- GET /accounts: Retrieves account information from all accounts
+- POST /accounts/{JSON String}: Posts a new account to the DB
+- GET /budget/{accountId}: Retrieves the budget for a given account
+- GET /budgets: Retrieves budget information for all accounts
+- POST /budget/{accountId}/{newBudget}: Updates the budget info for an account
+- GET /income/{accountId}: Retrieves the income for a given account
+- GET /incomes: Retrieves income information for all accounts
+- POST /incomes/{accountId}/{newBudget}: Updates the income information for an account
+
 ## Build
 
 Run `mvn clean install` at package directory.

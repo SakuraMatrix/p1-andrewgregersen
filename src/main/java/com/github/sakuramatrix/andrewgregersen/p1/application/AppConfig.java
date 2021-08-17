@@ -50,6 +50,7 @@ public class AppConfig {
                                     .receive()
                                     .asString()
                                     .map(Main::parseAccount)
+                                    .map(accountService::newAccount)
                                     .map(Main::toByteBuff)
                                     .log("https-server")))
                     .get(
@@ -66,7 +67,7 @@ public class AppConfig {
                             response.send(
                                 accountService
                                     .getBudget(request.param("accountId"))
-                                    .map(Main::toByteBuff)
+                                    .map(Main::doubleToByteBuff)
                                     .log("http-server-budget")))
                     .get(
                         "/budgets",
@@ -74,7 +75,7 @@ public class AppConfig {
                             response.send(
                                 accountService
                                     .getAllBudgets()
-                                    .map(Main::toByteBuff)
+                                    .map(Main::doubleToByteBuff)
                                     .log("http-server-budgets")))
                     .post(
                         "/budgets/{accountId}/{newAmount}",
@@ -88,7 +89,7 @@ public class AppConfig {
                             response.send(
                                 accountService
                                     .getIncome(request.param("accountId"))
-                                    .map(Main::toByteBuff)
+                                    .map(Main::doubleToByteBuff)
                                     .log("http-server-income")))
                     .get(
                         "/incomes",
@@ -96,7 +97,7 @@ public class AppConfig {
                             response.send(
                                 accountService
                                     .getAllIncomes()
-                                    .map(Main::toByteBuff)
+                                    .map(Main::doubleToByteBuff)
                                     .log("http-server-incomes")))
                     .post(
                         "/income/{accountId}/{newAmount}",

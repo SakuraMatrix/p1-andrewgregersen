@@ -8,7 +8,7 @@ Create TABLE IF NOT EXISTS accounts (
     last_name text,
     income double,
     budget double,
-    PRIMARY KEY (account_id,last_name)
+    PRIMARY KEY (account_id)
 );
 
 insert into accounts (account_id, first_name,last_name,income,budget) values (1,"Andrew","Gregersen",1234.50,500.00);
