@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Map;
+
 @Service
 public class AccountService {
 
@@ -24,6 +26,11 @@ public class AccountService {
   public Mono<Account> getAccount(String uuid) {
     log.info("Parsing UUID from String");
     return repo.read(Integer.parseInt(uuid));
+  }
+
+  public Mono<Integer> deleteAccount(String uuid) {
+    log.info("Deleting from DB");
+    return repo.deleteAccount(Integer.parseInt(uuid));
   }
 
   public Flux<Account> getAll() {
@@ -54,11 +61,15 @@ public class AccountService {
     return repo.readAllIncome();
   }
 
-  public Double updateBudget(String uuid, String newAmount) {
-    return repo.updateBudget(Double.parseDouble(newAmount), Integer.parseInt(uuid));
+  public Double updateBudget(Map<String, String> map) {
+    log.info("Updating budget");
+
+    return repo.updateBudget(
+        Double.parseDouble(map.get("newAmount")), Integer.parseInt(map.get("accountId")));
   }
 
   public Double updateIncome(String uuid, String newAmount) {
+    log.info("Updating Income");
     return repo.updateIncome(Double.parseDouble(newAmount), Integer.parseInt(uuid));
   }
 }

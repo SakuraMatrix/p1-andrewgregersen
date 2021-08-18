@@ -1,8 +1,8 @@
 package com.github.sakuramatrix.andrewgregersen.p1.application;
 
 import com.datastax.oss.driver.api.core.CqlSession;
+import com.github.sakuramatrix.andrewgregersen.p1.App;
 import com.github.sakuramatrix.andrewgregersen.p1.application.account.AccountService;
-import com.github.sakuramatrix.andrewgregersen.p1.domain.Main;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -40,7 +40,7 @@ public class AppConfig {
                             response.send(
                                 accountService
                                     .getAll()
-                                    .map(Main::toByteBuff)
+                                    .map(App::toByteBuff)
                                     .log("http-server-accounts")))
                     .post(
                         "/accounts",
@@ -49,9 +49,9 @@ public class AppConfig {
                                 request
                                     .receive()
                                     .asString()
-                                    .map(Main::parseAccount)
+                                    .map(App::parseAccount)
                                     .map(accountService::newAccount)
-                                    .map(Main::toByteBuff)
+                                    .map(App::toByteBuff)
                                     .log("https-server")))
                     .get(
                         "/account/{accountId}",
@@ -59,15 +59,23 @@ public class AppConfig {
                             response.send(
                                 accountService
                                     .getAccount(request.param("accountId"))
-                                    .map(Main::toByteBuff)
+                                    .map(App::toByteBuff)
                                     .log("http-server-account")))
+                    .get(
+                        "/account/delete/{accountId}",
+                        (request, response) ->
+                            response.send(
+                                accountService
+                                    .deleteAccount(request.param("accountId"))
+                                    .map(App::intToByteBuff)
+                                    .log("https-server")))
                     .get(
                         "/budget/{accountId}",
                         (request, response) ->
                             response.send(
                                 accountService
                                     .getBudget(request.param("accountId"))
-                                    .map(Main::doubleToByteBuff)
+                                    .map(App::doubleToByteBuff)
                                     .log("http-server-budget")))
                     .get(
                         "/budgets",
@@ -75,21 +83,21 @@ public class AppConfig {
                             response.send(
                                 accountService
                                     .getAllBudgets()
-                                    .map(Main::doubleToByteBuff)
+                                    .map(App::doubleToByteBuff)
                                     .log("http-server-budgets")))
-                    .post(
+                    .get(
                         "/budgets/{accountId}/{newAmount}",
                         (request, response) ->
-                            response.sendObject(
-                                accountService.updateBudget(
-                                    request.param("account_id"), request.param("newAmount"))))
+                            response.send(
+                                Mono.just(accountService.updateBudget(request.params()))
+                                    .map(App::doubleToByteBuff)))
                     .get(
                         "/income/{accountId}",
                         (request, response) ->
                             response.send(
                                 accountService
                                     .getIncome(request.param("accountId"))
-                                    .map(Main::doubleToByteBuff)
+                                    .map(App::doubleToByteBuff)
                                     .log("http-server-income")))
                     .get(
                         "/incomes",
@@ -97,9 +105,9 @@ public class AppConfig {
                             response.send(
                                 accountService
                                     .getAllIncomes()
-                                    .map(Main::doubleToByteBuff)
+                                    .map(App::doubleToByteBuff)
                                     .log("http-server-incomes")))
-                    .post(
+                    .get(
                         "/income/{accountId}/{newAmount}",
                         (request, response) ->
                             response.sendObject(

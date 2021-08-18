@@ -16,9 +16,7 @@ The features implemented in this project should allow the user to do the followi
 3. Update the budget of an Account
     1. Increase
     2. Decease
-4. Budget their monthly spending
-    1. Is able to break it down week by week.
-5. Update their information as needed (budget allowance)
+4. Update their information as needed (budget,income)
 
 ## Technologies
 

@@ -3,12 +3,16 @@ package com.github.sakuramatrix.andrewgregersen.p1.application.account;
 import ch.qos.logback.classic.Logger;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.SimpleStatement;
+import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
+import com.datastax.oss.driver.api.querybuilder.update.Update;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Random;
+
+import static com.datastax.oss.driver.api.querybuilder.QueryBuilder.bindMarker;
 
 @Repository
 public class AccountRepository {
@@ -45,7 +49,7 @@ public class AccountRepository {
    * Reads from the Database a single account
    *
    * @param uuid: The users account number to read
-   * @return: A Mono for an Account object in a form usable to the HTTP server
+   * @return A Mono for an Account object in a form usable to the HTTP server
    */
   public Mono<Account> read(int uuid) {
     log.info("Attempting to read from DB");
@@ -67,7 +71,7 @@ public class AccountRepository {
   /**
    * Reads all accounts from the DB
    *
-   * @return: A Flux of all accounts in the database
+   * @return A Flux of all accounts in the database
    */
   public Flux<Account> readAll() {
     log.info("Attempting to read from DB");
@@ -80,6 +84,17 @@ public class AccountRepository {
                     row.getString("last_name"),
                     row.getDouble("income"),
                     row.getDouble("budget")));
+  }
+
+  public Mono<Integer> deleteAccount(int uuid) {
+    log.info("Attempting to delete");
+    Flux.from(
+            session.executeReactive(
+                SimpleStatement.builder("DELETE FROM personalFinance.accounts WHERE account_id = ?")
+                    .addPositionalValue(uuid)
+                    .build()))
+        .subscribe();
+    return Mono.just(uuid);
   }
 
   /**
@@ -119,11 +134,20 @@ public class AccountRepository {
    */
   public Double updateIncome(double income, int uuid) {
     SimpleStatement stmt =
-        SimpleStatement.builder(
-                "UPDATE personalFinance.accounts SET income = ? WHERE account_id = ? IF EXISTS")
-            .addPositionalValues(income, uuid)
+        QueryBuilder.update("personalFinance", "accounts")
+            .setColumn("income", bindMarker("income"))
+            .whereColumn("account_id")
+            .isEqualTo(bindMarker("account_id"))
             .build();
-    session.executeReactive(stmt);
+
+    Mono.from(
+            session.executeReactive(
+                session
+                    .prepare(stmt)
+                    .bind()
+                    .setDouble("income", income)
+                    .setInt("account_id", uuid)))
+        .subscribe();
     return income;
   }
 
@@ -163,16 +187,22 @@ public class AccountRepository {
    * @return The new amount stored in the DB
    */
   public Double updateBudget(double budget, int uuid) {
-    SimpleStatement stmt =
-        SimpleStatement.builder(
-                "UPDATE personalFinance.accounts SET budget = ? WHERE account_id = ? IF EXISTS")
-            .addPositionalValues(budget, uuid)
-            .build();
-    session.executeReactive(stmt);
+    log.info("Attempting to update Budget");
+
+    Update update =
+        QueryBuilder.update("personalFinance", "accounts")
+            .setColumn("budget", bindMarker())
+            .whereColumn("account_id")
+            .isEqualTo(bindMarker());
+
+    Mono.from(
+            session.executeReactive(
+                session.prepare(update.build()).bind().setDouble(0, budget).setInt(1, uuid)))
+        .subscribe();
     return budget;
   }
 
-  /** Used for creating new accounts that dont have a given user Id */
+  /** Used for creating new accounts that don't have a given user Id */
   private static final Random ID_GENERATOR = new Random();
 
   protected static int getNewID() {

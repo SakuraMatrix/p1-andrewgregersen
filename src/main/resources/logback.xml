@@ -11,14 +11,13 @@
             <pattern>%d %p %t %c -%m%n</pattern>
         </encoder>
     </appender>
+
+
     <logger name="main"/>
     <logger name="cass"/>
     <logger name="cass.account"/>
     <logger name="cass.account.repo"/>
     <logger name="cass.account.server"/>
-    <logger name="cass.budget"/>
-    <logger name="server"/>
-    <logger name="finance"/>
 
 
     <root level="debug">

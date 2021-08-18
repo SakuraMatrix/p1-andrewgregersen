@@ -1,5 +1,8 @@
 package com.github.sakuramatrix.andrewgregersen.p1.application.account;
 
+import ch.qos.logback.classic.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Objects;
 
 public class Account {
@@ -8,6 +11,9 @@ public class Account {
   private int id;
   private double budget;
   private double income;
+
+  public static final Logger log =
+      (ch.qos.logback.classic.Logger) LoggerFactory.getLogger("cass.account");
 
   public static Account from(int id, String fName, String lName) {
     return new Account(id, fName, lName);
@@ -24,12 +30,14 @@ public class Account {
   public Account() {}
 
   private Account(int id, String fName, String lName) {
+    log.info("Creating new Account w/out budget/income");
     this.fName = fName;
     this.lName = lName;
     this.id = id;
   }
 
   public Account(int id, String first_name, String last_name, double budget, double income) {
+    log.info("Creating new Account");
     this.fName = first_name;
     this.lName = last_name;
     this.id = id;

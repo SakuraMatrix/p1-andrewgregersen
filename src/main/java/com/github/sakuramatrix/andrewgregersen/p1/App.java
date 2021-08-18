@@ -1,4 +1,4 @@
-package com.github.sakuramatrix.andrewgregersen.p1.domain;
+package com.github.sakuramatrix.andrewgregersen.p1;
 
 import ch.qos.logback.classic.Logger;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -13,7 +13,7 @@ import reactor.netty.DisposableServer;
 
 import java.io.IOException;
 
-public class Main {
+public class App {
 
   private static final Logger log = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger("main");
 
@@ -24,6 +24,7 @@ public class Main {
         new AnnotationConfigApplicationContext(AppConfig.class);
     log.info("Attempting to create a HTTP server");
     applicationContext.getBean(DisposableServer.class).onDispose().block();
+    applicationContext.close();
   }
 
   private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
@@ -42,6 +43,16 @@ public class Main {
     try {
       return Unpooled.buffer()
           .writeBytes(OBJECT_MAPPER.writerFor(Double.class).writeValueAsBytes(o));
+    } catch (JsonProcessingException e) {
+      e.printStackTrace();
+    }
+    return null;
+  }
+
+  public static ByteBuf intToByteBuff(Object o) {
+    try {
+      return Unpooled.buffer()
+          .writeBytes(OBJECT_MAPPER.writerFor(Integer.class).writeValueAsBytes(o));
     } catch (JsonProcessingException e) {
       e.printStackTrace();
     }
