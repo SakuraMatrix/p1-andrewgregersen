@@ -33,6 +33,7 @@ The following technologies were used:
 
 - GET `/account/{accountId}`: Retrieves the account information from the given ID
     - Example:`{"id":1,"budget":500.0,"income":1000.0,"fname":"Andrew","lname":"Gregersen"}`
+- GET `/account/delete/{accountId}`: Removes the given account from the DB
 - GET `/accounts`: Retrieves account information from all accounts
 - POST `/accounts/{JSON String}`: Posts a new account to the DB
 - GET `/budget/{accountId}`: Retrieves the budget for a given account

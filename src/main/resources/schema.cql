@@ -11,4 +11,6 @@ Create TABLE IF NOT EXISTS accounts (
     PRIMARY KEY (account_id)
 );
 
-insert into accounts (account_id, first_name,last_name,income,budget) values (1,"Andrew","Gregersen",1234.50,500.00);
+insert into accounts (account_id, first_name,last_name,income,budget) values (1,'Andrew','Gregersen',1234.50,500.00);
+-- '{"id":1,"fname":"Andrew","lname":"Gregersen","income":1234.50,"budget":500.00}'
+-- '{"id":1,"fname":"Joe","lname":"Shmoe","income":2000.00,"budget":1000.00}'

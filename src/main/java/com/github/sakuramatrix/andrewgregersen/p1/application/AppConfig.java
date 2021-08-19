@@ -88,9 +88,9 @@ public class AppConfig {
                     .get(
                         "/budgets/{accountId}/{newAmount}",
                         (request, response) ->
-                            response.send(
-                                Mono.just(accountService.updateBudget(request.params()))
-                                    .map(App::doubleToByteBuff)))
+                            response.sendString(
+                                Mono.just(
+                                    accountService.updateBudget(request.params()).toString())))
                     .get(
                         "/income/{accountId}",
                         (request, response) ->
