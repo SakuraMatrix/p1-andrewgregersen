@@ -1,13 +1,15 @@
 package com.github.sakuramatrix.andrewgregersen.p1;
 
+import com.github.sakuramatrix.andrewgregersen.p1.application.AppConfig;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-@SpringJUnitConfig(classes = App.class)
+@SpringJUnitConfig(classes = AppConfig.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class AppTest {
 
@@ -17,10 +19,10 @@ public class AppTest {
 
   @BeforeAll
   public void setup() {
-    this.rest = WebTestClient.bindToApplicationContext(context).configureClient().build();
+    this.rest = WebTestClient.bindToApplicationContext(this.context).configureClient().build();
   }
 
-  // @Test
+  @Test
   public void postAccount() {
     rest.post()
         .uri("/accounts")
@@ -32,7 +34,7 @@ public class AppTest {
         .is2xxSuccessful();
   }
 
-  // @Test
+  @Test
   public void postAccount2() {
     rest.post()
         .uri("/accounts")
@@ -44,52 +46,52 @@ public class AppTest {
         .is2xxSuccessful();
   }
 
-  // @Test
+  @Test
   public void getAllAccounts() {
     rest.get().uri("/accounts").exchange().expectStatus().isOk();
   }
 
-  // @Test
+  @Test
   public void getSingleAccount() {
     rest.get().uri("/account/1").exchange().expectStatus().isOk();
   }
 
-  // @Test
+  @Test
   public void getAllBudgets() {
     rest.get().uri("/budgets").exchange().expectStatus().isOk();
   }
 
-  // @Test
+  @Test
   public void getSingleBudget() {
     rest.get().uri("/budget/2").exchange().expectStatus().isOk();
   }
 
-  // @Test
+  @Test
   public void updateBudget() {
     rest.get().uri("/budgets/1/1000.54").exchange().expectStatus().isOk();
   }
 
-  // @Test
+  @Test
   public void getAllIncomes() {
     rest.get().uri("/incomes").exchange().expectStatus().isOk();
   }
 
-  // @Test
+  @Test
   public void getSingleIncome() {
     rest.get().uri("/income/2").exchange().expectStatus().isOk();
   }
 
-  // @Test
+  @Test
   public void updateIncome() {
     rest.get().uri("/income/2/5000.00").exchange().expectStatus().isOk();
   }
 
-  // @Test
+  @Test
   public void deleteAccount() {
     rest.get().uri("/account/delete/2").exchange().expectStatus().isOk();
   }
 
-  // @Test
+  @Test
   public void deleteAccount2() {
     rest.get().uri("/account/delete/1").exchange().expectStatus().isOk();
   }
